@@ -1,8 +1,15 @@
 // utils/emailService.js
 
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Nodemailer transporter with Gmail
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 /**
  * Modern email template styles
@@ -330,17 +337,17 @@ const getUserConfirmationTemplate = (contact) => `
  */
 const sendContactNotification = async (contact) => {
   try {
-    await resend.emails.send({
-      from: 'Portfolio Contact <onboarding@resend.dev>',
+    await transporter.sendMail({
+      from: `"Portfolio Contact" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_USER,
       subject: `🔔 New Portfolio Message from ${contact.fullName}`,
       replyTo: contact.email,
       html: getAdminNotificationTemplate(contact),
     });
 
-    console.log('✓ Notification email sent successfully via Resend!');
+    console.log('✓ Notification email sent successfully via Nodemailer!');
   } catch (error) {
-    console.error('✗ Error sending notification email via Resend:', error);
+    console.error('✗ Error sending notification email via Nodemailer:', error);
     throw error;
   }
 };
@@ -350,16 +357,16 @@ const sendContactNotification = async (contact) => {
  */
 const sendConfirmationEmail = async (contact) => {
   try {
-    await resend.emails.send({
-      from: 'Patchipala Srinivas <onboarding@resend.dev>',
+    await transporter.sendMail({
+      from: `"P Srinivas" <${process.env.EMAIL_USER}>`,
       to: contact.email,
       subject: `✓ Message Received - Thank You, ${contact.firstName}!`,
       html: getUserConfirmationTemplate(contact),
     });
 
-    console.log(`✓ Confirmation email sent to ${contact.email} via Resend!`);
+    console.log(`✓ Confirmation email sent to ${contact.email} via Nodemailer!`);
   } catch (error) {
-    console.error(`✗ Error sending confirmation email to ${contact.email} via Resend:`, error);
+    console.error(`✗ Error sending confirmation email to ${contact.email} via Nodemailer:`, error);
     throw error;
   }
 };
