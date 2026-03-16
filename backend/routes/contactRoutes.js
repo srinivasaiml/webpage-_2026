@@ -18,19 +18,15 @@ const validateContact = [
     .trim()
     .notEmpty()
     .withMessage('First name is required')
-    .isLength({ min: 2, max: 50 })
-    .withMessage('First name must be between 2 and 50 characters')
-    .matches(/^[a-zA-Z\s]+$/)
-    .withMessage('First name can only contain letters and spaces'),
+    .isLength({ min: 1 })
+    .withMessage('First name must have at least 1 character'),
   
   body('lastName')
     .trim()
     .notEmpty()
     .withMessage('Last name is required')
-    .isLength({ min: 2, max: 50 })
-    .withMessage('Last name must be between 2 and 50 characters')
-    .matches(/^[a-zA-Z\s]+$/)
-    .withMessage('Last name can only contain letters and spaces'),
+    .isLength({ min: 1 })
+    .withMessage('Last name must have at least 1 character'),
   
   body('email')
     .trim()
@@ -44,15 +40,15 @@ const validateContact = [
     .trim()
     .notEmpty()
     .withMessage('Subject is required')
-    .isLength({ min: 5, max: 200 })
-    .withMessage('Subject must be between 5 and 200 characters'),
+    .isLength({ min: 1 })
+    .withMessage('Subject must have at least 1 character'),
   
   body('message')
     .trim()
     .notEmpty()
     .withMessage('Message is required')
-    .isLength({ min: 10, max: 1000 })
-    .withMessage('Message must be between 10 and 1000 characters')
+    .isLength({ min: 1 })
+    .withMessage('Message must have at least 1 character')
 ];
 
 // Public route

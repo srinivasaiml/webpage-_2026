@@ -66,16 +66,12 @@ app.get('/api/health', (req, res) => {
 
 
 // General Middleware & API Routes
-app.use('/api', trackVisitor); // This middleware will run for all subsequent /api routes
+// API Routes
+app.use('/api', trackVisitor);
 app.use('/api/admin', adminRoutes);
-app.use('/api/', generalLimiter); // Apply general rate limiting to all /api routes
+app.use('/api/', generalLimiter);
 
-
-
-// FIX: REMOVE contactLimiter from here. It will be applied inside contactRoutes.js
-app.use('/api/contact', contactRoutes); 
-
-
+// Contact routes with rate limiting
 app.use('/api/contact', contactLimiter, contactRoutes);
 
 
