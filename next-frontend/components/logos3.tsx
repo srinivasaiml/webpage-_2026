@@ -118,7 +118,7 @@ const Logos3 = ({
                   key={logo.id}
                   className="flex basis-1/3 justify-center pl-0 sm:basis-1/4 md:basis-1/5 lg:basis-1/6"
                 >
-                  <div className="mx-10 flex shrink-0 items-center justify-center">
+                  <div className="mx-6 md:mx-10 flex shrink-0 items-center justify-center">
                     <div>
                       <img
                         src={logo.image}
