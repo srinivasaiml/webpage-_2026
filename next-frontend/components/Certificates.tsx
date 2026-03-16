@@ -98,7 +98,7 @@ const TiltBox = ({ cert, index }: { cert: Certificate; index: number }) => {
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.6, delay: Math.min(index * 0.1, 0.4) }}
       style={{ perspective: "1500px" }}
-      className="relative w-full h-[440px] z-1"
+      className="relative w-full h-[380px] sm:h-[440px] z-1"
     >
       <motion.div
         ref={ref}
@@ -245,7 +245,7 @@ export default function Certificates() {
                 Credentials
               </span>
             </div>
-            <h2 className="text-5xl md:text-6xl lg:text-8xl font-black tracking-tight text-slate-950 dark:text-white font-playfair italic leading-[1.1]">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black tracking-tight text-slate-950 dark:text-white font-playfair italic leading-[1.1]">
               Professional<br />
               <span className="bg-linear-to-r from-violet-600 to-indigo-600 dark:from-violet-400 dark:to-indigo-400 bg-clip-text text-transparent not-italic">
                 Certifications
@@ -260,7 +260,7 @@ export default function Certificates() {
             transition={{ delay: 0.2 }}
             className="md:w-5/12 ml-auto"
           >
-            <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
+            <p className="text-base md:text-lg lg:text-xl text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
               Showcasing continuous learning and validated expertise across modern software engineering domains through interactive 3D visualizations.
             </p>
           </motion.div>

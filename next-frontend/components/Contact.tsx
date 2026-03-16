@@ -88,7 +88,7 @@ const Contact = () => {
                             <div className="w-12 h-12 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 flex items-center justify-center mb-6">
                                 <Mail className="text-indigo-600 dark:text-indigo-400" size={24} />
                             </div>
-                            <h2 className="text-5xl font-bold text-slate-900 dark:text-white mb-6 tracking-tight">
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6 tracking-tight">
                                 Let's Connect
                             </h2>
                             <p className="text-lg text-slate-600 dark:text-slate-400 max-w-md leading-relaxed">
