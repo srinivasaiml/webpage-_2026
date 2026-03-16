@@ -11,9 +11,25 @@ router.get('/stats', async (req, res) => {
   try {
     const totalVisits = await Visitor.countDocuments();
     const totalMessages = await Contact.countDocuments();
+    
+    // Get stats by status
+    const messageStats = await Contact.aggregate([
+      { $group: { _id: '$status', count: { $sum: 1 } } }
+    ]);
+    
+    const byStatus = messageStats.reduce((acc, stat) => {
+      acc[stat._id || 'new'] = stat.count;
+      return acc;
+    }, {});
+
     res.json({
       success: true,
-      data: { totalVisits, totalMessages },
+      data: { 
+        totalVisits, 
+        totalMessages, 
+        byStatus,
+        new: byStatus.new || 0
+      },
     });
   } catch (error) {
     console.error('--- CRASH IN /api/admin/stats ---', error);

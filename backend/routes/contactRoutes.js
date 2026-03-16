@@ -9,6 +9,7 @@ const {
   deleteContact,
   getContactStats
 } = require('../controllers/contactController');
+const { protectAdmin } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
@@ -57,10 +58,10 @@ router.post('/', contactLimiter, validateContact, createContact);
 
 // Admin routes (These are now only protected by the less aggressive generalLimiter 
 // applied in server.js, and the x-admin-secret-key middleware on the backend)
-router.get('/', getAllContacts);
-router.get('/stats', getContactStats);
-router.get('/:id', getContactById);
-router.patch('/:id/status', updateContactStatus);
-router.delete('/:id', deleteContact);
+router.get('/', protectAdmin, getAllContacts);
+router.get('/stats', protectAdmin, getContactStats);
+router.get('/:id', protectAdmin, getContactById);
+router.patch('/:id/status', protectAdmin, updateContactStatus);
+router.delete('/:id', protectAdmin, deleteContact);
 
 module.exports = router;

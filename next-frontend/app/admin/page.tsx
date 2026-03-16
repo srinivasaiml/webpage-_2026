@@ -14,6 +14,7 @@ interface Stats {
   totalVisits: number;
   totalMessages: number;
   new?: number;
+  byStatus?: Record<string, number>;
 }
 
 interface Message {
@@ -249,7 +250,7 @@ const AdminPage = () => {
     const headers = getHeaders(storedKey || '');
     try {
       const [statsRes, messagesRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/contact/stats`, { headers }),
+        fetch(`${API_BASE_URL}/api/admin/stats`, { headers }),
         fetch(`${API_BASE_URL}/api/contact`, { headers }),
       ]);
       
@@ -259,7 +260,7 @@ const AdminPage = () => {
       const statsJson = await statsRes.json();
       const messagesJson = await messagesRes.json();
 
-      setStats(statsJson.data?.byStatus || statsJson.data || statsJson);
+      setStats(statsJson.data || statsJson);
 
       const msgs = Array.isArray(messagesJson.data) 
         ? messagesJson.data 
@@ -306,11 +307,30 @@ const AdminPage = () => {
     setFilteredMessages(filtered);
   }, [searchTerm, messages, filterStatus, filterPriority]);
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (secretKey) {
-      sessionStorage.setItem('admin-secret-key', secretKey);
-      setIsAuthenticated(true);
+    if (!secretKey) return;
+    
+    setLoading(true);
+    setError('');
+    
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/stats`, {
+        headers: getHeaders(secretKey),
+      });
+      
+      if (res.ok) {
+        sessionStorage.setItem('admin-secret-key', secretKey);
+        setIsAuthenticated(true);
+      } else {
+        const data = await res.json();
+        setError(data.message || 'Invalid secret key. Access denied.');
+      }
+    } catch (err) {
+        console.error("Auth verification error:", err);
+        setError('Connection failed. Please check if backend is running.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -443,13 +463,23 @@ const AdminPage = () => {
                   />
                 </div>
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={{ scale: loading ? 1 : 1.02 }}
+                  whileTap={{ scale: loading ? 1 : 0.98 }}
+                  disabled={loading}
                   type="submit"
-                  className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  <LogIn className="w-5 h-5" />
-                  Unlock Dashboard
+                  {loading ? (
+                    <>
+                      <Loader className="w-5 h-5 animate-spin" />
+                      <span>Verifying...</span>
+                    </>
+                  ) : (
+                    <>
+                      <LogIn className="w-5 h-5" />
+                      <span>Unlock Dashboard</span>
+                    </>
+                  )}
                 </motion.button>
               </form>
               {error && (
@@ -598,9 +628,9 @@ const AdminPage = () => {
             className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10"
           >
             {[
-              { label: 'New Messages', value: stats.new || 0, icon: Inbox, color: 'blue' },
-              { label: 'Total Messages', value: totalMessages, icon: Mail, color: 'indigo' },
-              { label: 'Response Rate', value: '98%', icon: BarChart2, color: 'purple' },
+              { label: 'New Messages', value: stats.new || (stats.byStatus?.new || 0), icon: Inbox, color: 'blue' },
+              { label: 'Total Messages', value: stats.totalMessages || 0, icon: Mail, color: 'indigo' },
+              { label: 'Total Visits', value: stats.totalVisits || 0, icon: Users, color: 'purple' },
             ].map((stat, i) => (
               <motion.div 
                 key={i}

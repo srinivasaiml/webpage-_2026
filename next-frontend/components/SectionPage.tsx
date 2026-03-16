@@ -22,7 +22,7 @@ const SectionPage = ({ children, className = '' }: SectionPageProps) => {
             animate="animate"
             exit="exit"
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            className={`min-h-screen pb-28 ${className}`}
+            className={`min-h-screen ${className}`}
         >
             {children}
         </motion.div>
