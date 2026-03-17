@@ -6,6 +6,7 @@ import { Float, MeshDistortMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { useTheme } from './ThemeProvider';
+import Image from 'next/image';
 
 const LiquidBackground = () => {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -74,11 +75,11 @@ export default function Hero() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.fromTo(revealRef.current, 
+      gsap.fromTo(revealRef.current,
         { filter: "blur(30px)", opacity: 0, scale: 1.02 },
         { filter: "blur(0px)", opacity: 1, scale: 1, duration: 2.2, ease: "expo.out" }
       );
-      
+
       gsap.from(".command-cell", {
         x: 60, opacity: 0, stagger: 0.1, duration: 1.5, ease: "power4.out", delay: 1, clearProps: "all"
       });
@@ -88,7 +89,7 @@ export default function Hero() {
         const rect = ctaRef.current.getBoundingClientRect();
         const dist = Math.hypot(e.clientX - (rect.left + rect.width / 2), e.clientY - (rect.top + rect.height / 2));
         if (dist < 150) {
-          gsap.to(ctaRef.current, { x: (e.clientX - (rect.left + rect.width/2)) * 0.4, y: (e.clientY - (rect.top + rect.height/2)) * 0.4, duration: 0.6 });
+          gsap.to(ctaRef.current, { x: (e.clientX - (rect.left + rect.width / 2)) * 0.4, y: (e.clientY - (rect.top + rect.height / 2)) * 0.4, duration: 0.6 });
         } else {
           gsap.to(ctaRef.current, { x: 0, y: 0, duration: 0.8, ease: "elastic.out(1, 0.3)" });
         }
@@ -110,19 +111,19 @@ export default function Hero() {
         </Canvas>
       </div>
 
-      <div ref={revealRef} className="relative z-10 w-full flex flex-col md:flex-row p-8 md:p-14 lg:p-20 min-h-screen items-center md:items-stretch gap-10 max-w-7xl mx-auto">
-        <div className="flex-1 min-w-0 flex flex-col justify-between pb-12 md:pb-8 w-full">
+      <div ref={revealRef} className="relative z-10 w-full flex flex-col md:flex-row pt-32 pb-12 px-6 md:p-14 lg:p-20 min-h-screen md:items-stretch gap-12 md:gap-10 max-w-7xl mx-auto">
+        <div className="flex-1 min-w-0 flex flex-col justify-center md:justify-between w-full">
           <div className="flex items-center gap-3">
-             <div className="relative w-2.5 h-2.5 bg-black dark:bg-white rounded-full transition-colors duration-500">
-                <div className="absolute inset-0 bg-black dark:bg-white rounded-full animate-ping opacity-30 transition-colors duration-500" />
-             </div>
-             <span className="font-mono text-[11px] font-bold text-black dark:text-white tracking-[0.2em] uppercase transition-colors duration-500">SRINIVAS.DEV</span>
+            <div className="relative w-2.5 h-2.5 bg-black dark:bg-white rounded-full transition-colors duration-500">
+              <div className="absolute inset-0 bg-black dark:bg-white rounded-full animate-ping opacity-30 transition-colors duration-500" />
+            </div>
+            <span className="font-mono text-[11px] font-bold text-black dark:text-white tracking-[0.2em] uppercase transition-colors duration-500">SRINIVAS.DEV</span>
           </div>
 
-          <div className="max-w-4xl lg:-translate-y-8 pr-12 my-8 md:my-0">
-            <h1 className="text-[clamp(3.5rem,8.5vw,10.5rem)] font-black leading-[0.87] tracking-tighter text-black dark:text-white uppercase italic-none transition-colors duration-500">
-              PATCHIPALA <br /> 
-              <span 
+          <div className="max-w-4xl lg:-translate-y-8 pr-0 md:pr-12 my-8 md:my-0">
+            <h1 className="text-[clamp(1.8rem,11.5vw,10.5rem)] font-black leading-[0.87] tracking-tighter text-black dark:text-white uppercase italic-none transition-colors duration-500">
+              PATCHIPALA <br />
+              <span
                 className="text-outline"
                 style={{ WebkitTextFillColor: "transparent", WebkitTextStroke: "2px currentColor" }}
               >
@@ -133,50 +134,60 @@ export default function Hero() {
               We engineer immersive digital experiences through spatial logic and advanced WebGL.
             </p>
           </div>
-          
-          <button ref={ctaRef} className="w-fit flex items-center gap-6 group lg:-translate-y-12">
-             <div className="w-14 h-14 rounded-full border border-black/15 dark:border-white/15 flex items-center justify-center group-hover:bg-black dark:group-hover:bg-white transition-all duration-500 overflow-hidden">
+
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 lg:-translate-y-12 mt-6 md:mt-0">
+            <button ref={ctaRef} className="w-fit flex items-center gap-4 group">
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-full border border-black/15 dark:border-white/15 flex items-center justify-center group-hover:bg-black dark:group-hover:bg-white transition-all duration-500 overflow-hidden shrink-0">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="group-hover:stroke-white dark:group-hover:stroke-black stroke-black dark:stroke-white transition-colors duration-500">
-                  <path d="M7 17L17 7M17 7H8M17 7V16" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M7 17L17 7M17 7H8M17 7V16" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-             </div>
-             <span className="font-mono text-[11px] font-bold text-black dark:text-white uppercase tracking-[0.2em] transition-colors duration-500">Start a Project</span>
-          </button>
+              </div>
+              <span className="font-mono text-[10px] md:text-[11px] font-bold text-black dark:text-white uppercase tracking-[0.2em] transition-colors duration-500 text-left">Start a Project</span>
+            </button>
+            <a href="/Srinivas_P_2026.pdf" download className="w-fit flex items-center gap-4 group">
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-full border border-black/15 dark:border-white/15 flex items-center justify-center group-hover:bg-black dark:group-hover:bg-white transition-all duration-500 overflow-hidden shrink-0">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="group-hover:stroke-white dark:group-hover:stroke-black stroke-black dark:stroke-white transition-colors duration-500">
+                  <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <span className="font-mono text-[10px] md:text-[11px] font-bold text-black dark:text-white uppercase tracking-[0.2em] transition-colors duration-500 text-left">Download Resume</span>
+            </a>
+          </div>
         </div>
 
         {/* Right Side Deck */}
-        <div className="w-full md:w-80 lg:w-96 flex-shrink-0 flex flex-col gap-4 justify-center z-20">
+        <div className="w-full md:w-80 lg:w-[450px] shrink-0 flex flex-col gap-4 justify-center z-20 pb-12 md:pb-0 translate-x-0 md:translate-x-10 lg:translate-x-50 translate-y-0 lg:-translate-y-16">
           {[
-            { id: "001", title: "AVAILABILITY", val: "Open", type: "progress" },
-            { id: "002", title: "STUDIO STATS", val: "20+ Wins", type: "data" },
-            { id: "003", title: "EXPERTISE", val: "Creative Dev", type: "text" }
+            { id: "003", title: "EXPERTISE", val: "Creative Dev", type: "image" }
           ].map((item) => (
-            <div key={item.id} className="command-cell p-6 sm:p-7 block opacity-1 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl backdrop-blur-md transition-colors duration-500">
-              <span className="font-mono text-[9px] text-black/30 dark:text-white/25 uppercase tracking-widest block mb-3 transition-colors duration-500">{item.id} // {item.title}</span>
-              {item.type === "progress" ? (
-                <div className="flex justify-between items-end mt-2">
-                  <h4 className="text-2xl sm:text-3xl font-bold text-black dark:text-white tracking-tighter transition-colors duration-500">{item.val}</h4>
-                  <div className="h-[2px] w-20 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden mb-1 transition-colors duration-500">
-                     <div className="h-full bg-black dark:bg-white w-[60%] animate-pulse transition-colors duration-500" />
-                  </div>
-                </div>
-              ) : item.type === "data" ? (
-                <div className="mt-4 flex flex-col gap-3">
-                  <div className="flex justify-between text-[10px] font-mono text-black/60 dark:text-white/50 transition-colors duration-500">
-                    <span>Awwwards Tier</span>
-                    <span>2024-25</span>
-                  </div>
-                  <div className="h-[1px] w-full bg-black/10 dark:bg-white/10 transition-colors duration-500" />
-                  <div className="flex justify-between text-[10px] font-mono text-black/60 dark:text-white/50 transition-colors duration-500">
-                    <span>Retention Rate</span>
-                    <span>98.2%</span>
-                  </div>
-                </div>
-              ) : (
-                <h3 className="text-sm font-medium text-black/70 dark:text-white/70 mt-3 leading-snug transition-colors duration-500">
-                  Transforming static interfaces into <span className="italic text-black dark:text-white transition-colors duration-500">narrative apertures</span>.
-                </h3>
+            <div
+              key={item.id}
+              className={`command-cell block transition-colors duration-500 ${item.type === 'image'
+                ? 'flex flex-col items-center justify-center pt-4 md:pt-8'
+                : 'p-6 sm:p-7 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl backdrop-blur-md'
+                }`}
+            >
+              {item.type !== 'image' && (
+                <span className="font-mono text-[9px] text-black/30 dark:text-white/25 uppercase tracking-widest block mb-3 transition-colors duration-500">
+                  {item.id} // {item.title}
+                </span>
               )}
+              {item.type === "image" ? (
+                <div className="flex flex-col items-center justify-center w-full relative z-50">
+                  <Image
+                    src="/srin.png"
+                    alt="P. Srinivas"
+                    width={400}
+                    height={500}
+                    className="object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
+                    priority
+                    unoptimized
+                  />
+                  <h3 className="text-[10px] sm:text-xs font-mono text-black/40 dark:text-white/40 mt-6 leading-relaxed transition-colors duration-500 text-center uppercase tracking-widest max-w-[250px]">
+                    Transforming static interfaces into <br /><span className="italic text-black/80 dark:text-white/80 transition-colors duration-500">narrative apertures</span>.
+                  </h3>
+                </div>
+              ) : null}
             </div>
           ))}
         </div>

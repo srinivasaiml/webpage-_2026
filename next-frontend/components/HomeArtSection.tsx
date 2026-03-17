@@ -28,7 +28,7 @@ export default function HomeArtSection() {
                             textClassName="text-[4.5px]"
                             speed={12}
                             direction="normal"
-                            className="w-32 h-32 md:w-56 md:h-56 lg:w-72 lg:h-72 shrink-0 md:-ml-8"
+                            className="w-48 h-48 sm:w-52 sm:h-52 md:w-56 md:h-56 lg:w-72 lg:h-72 shrink-0 md:-ml-8"
                         />
                         <motion.p
                             initial={{ opacity: 0, y: 20 }}
