@@ -1,14 +1,13 @@
 "use client";
 
 import React from 'react';
-import { cn } from '@/lib/utils';
 
 export default function Footer() {
     return (
         <footer className="relative w-full h-[50vh] flex flex-col items-center justify-center bg-white dark:bg-slate-950 overflow-hidden border-t border-slate-100 dark:border-slate-900 transition-colors duration-500">
             {/* Massive Background Text */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
-                <span className="text-[22vw] font-[1000] tracking-[-0.05em] text-slate-100/50 dark:text-white/[0.02] uppercase leading-none">
+                <span className="text-[22vw] font-[1000] tracking-[-0.05em] text-slate-100/50 dark:text-white/2 uppercase leading-none">
                     SRINIVAS
                 </span>
             </div>
@@ -34,7 +33,7 @@ export default function Footer() {
                 </div>
             </div>
 
-            {/* Subtle Vignette overlay to merge with page content */}
+            {/* Subtle Vignette overlay */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,white_100%)] dark:bg-[radial-gradient(circle_at_center,transparent_0%,#020617_100%)] opacity-40 pointer-events-none" />
         </footer>
     );

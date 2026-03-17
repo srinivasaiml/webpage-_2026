@@ -1,271 +1,186 @@
 "use client";
 
-import { motion, type Variants } from "framer-motion";
-import { ArrowRight, Sparkles, Code2, Zap, Globe, Layers } from "lucide-react";
-import { useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Logos3 } from "./logos3";
+import React, { useRef, useEffect, useMemo } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Float, MeshDistortMaterial } from '@react-three/drei';
+import * as THREE from 'three';
+import gsap from 'gsap';
+import { useTheme } from './ThemeProvider';
 
-type Point = { x: number; y: number };
-interface WaveConfig {
-  offset: number;
-  amplitude: number;
-  frequency: number;
-  color: string;
-  opacity: number;
-}
+const LiquidBackground = () => {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const { viewport } = useThree();
+  const uniforms = useMemo(() => ({
+    uTime: { value: 0 },
+    uMouse: { value: new THREE.Vector2(0, 0) },
+  }), []);
 
-const featurePills = [
-  { icon: Globe,  label: "Immersive Web Interfaces" },
-  { icon: Zap,    label: "Responsive Motion & Animations" },
-  { icon: Code2,  label: "High-Performance Applications" },
-  { icon: Layers, label: "Real-World Software Solutions" },
-] as const;
+  useFrame((state) => {
+    const { clock, mouse } = state;
+    if (meshRef.current) {
+      (meshRef.current.material as THREE.ShaderMaterial).uniforms.uTime.value = clock.getElapsedTime();
+      (meshRef.current.material as THREE.ShaderMaterial).uniforms.uMouse.value.lerp(mouse, 0.05);
+    }
+  });
 
-const containerVariants: Variants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.13, delayChildren: 0.1 } },
+  return (
+    <mesh ref={meshRef} scale={[viewport.width, viewport.height, 1]}>
+      <planeGeometry args={[1, 1]} />
+      <shaderMaterial
+        transparent
+        uniforms={uniforms}
+        vertexShader={`varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`}
+        fragmentShader={`
+          uniform float uTime; uniform vec2 uMouse; varying vec2 vUv;
+          void main() {
+            vec2 uv = vUv; float t = uTime * 0.15;
+            vec2 m = uMouse * 0.1;
+            float color = smoothstep(0.0, 1.0, (sin(uv.x * 8.0 + t + m.x * 12.0) + sin(uv.y * 6.0 - t + m.y * 12.0)) * 0.5 + 0.5);
+            gl_FragColor = vec4(mix(vec3(0.005), vec3(0.05), color), 1.0);
+          }
+        `}
+      />
+    </mesh>
+  );
 };
 
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 32 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
-};
+const Monolith = ({ theme }: { theme: 'light' | 'dark' }) => {
+  const meshRef = useRef<THREE.Mesh>(null);
+  useFrame((state) => {
+    if (meshRef.current) {
+      meshRef.current.rotation.y = state.clock.getElapsedTime() * 0.25;
+    }
+  });
 
-const fadeIn: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.6 } },
+  const materialColor = theme === 'light' ? "#ffffff" : "#0a0a0a";
+  const metalness = theme === 'light' ? 0.3 : 1.0;
+  const roughness = theme === 'light' ? 0.1 : 0.05;
+
+  return (
+    <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
+      <mesh ref={meshRef}>
+        <icosahedronGeometry args={[13, 1]} />
+        <MeshDistortMaterial color={materialColor} speed={4} distort={0.4} roughness={roughness} metalness={metalness} />
+      </mesh>
+    </Float>
+  );
 };
 
 export default function Hero() {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const mouseRef = useRef<Point>({ x: 0, y: 0 });
-  const targetMouseRef = useRef<Point>({ x: 0, y: 0 });
+  const { theme } = useTheme();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const revealRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(revealRef.current, 
+        { filter: "blur(30px)", opacity: 0, scale: 1.02 },
+        { filter: "blur(0px)", opacity: 1, scale: 1, duration: 2.2, ease: "expo.out" }
+      );
+      
+      gsap.from(".command-cell", {
+        x: 60, opacity: 0, stagger: 0.1, duration: 1.5, ease: "power4.out", delay: 1, clearProps: "all"
+      });
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let animationId: number;
-    let time = 0;
-
-    const computeThemeColors = () => {
-      const rootStyles = getComputedStyle(document.documentElement);
-      const resolveColor = (variables: string[], alpha = 1) => {
-        const tempEl = document.createElement("div");
-        tempEl.style.cssText = "position:absolute;visibility:hidden;width:1px;height:1px;";
-        document.body.appendChild(tempEl);
-        let color = `rgba(255,255,255,${alpha})`;
-        for (const variable of variables) {
-          const value = rootStyles.getPropertyValue(variable).trim();
-          if (value) {
-            tempEl.style.backgroundColor = `var(${variable})`;
-            const computed = getComputedStyle(tempEl).backgroundColor;
-            if (computed && computed !== "rgba(0, 0, 0, 0)") {
-              if (alpha < 1) {
-                const m = computed.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-                color = m ? `rgba(${m[1]},${m[2]},${m[3]},${alpha})` : computed;
-              } else {
-                color = computed;
-              }
-              break;
-            }
-          }
+      const handleMouseMove = (e: MouseEvent) => {
+        if (!ctaRef.current) return;
+        const rect = ctaRef.current.getBoundingClientRect();
+        const dist = Math.hypot(e.clientX - (rect.left + rect.width / 2), e.clientY - (rect.top + rect.height / 2));
+        if (dist < 150) {
+          gsap.to(ctaRef.current, { x: (e.clientX - (rect.left + rect.width/2)) * 0.4, y: (e.clientY - (rect.top + rect.height/2)) * 0.4, duration: 0.6 });
+        } else {
+          gsap.to(ctaRef.current, { x: 0, y: 0, duration: 0.8, ease: "elastic.out(1, 0.3)" });
         }
-        document.body.removeChild(tempEl);
-        return color;
       };
-
-      return {
-        backgroundTop: resolveColor(["--background"], 1),
-        backgroundBottom: resolveColor(["--muted", "--background"], 0.95),
-        wavePalette: [
-          { offset: 0,              amplitude: 70, frequency: 0.003,  color: resolveColor(["--primary"], 0.8),               opacity: 0.45 },
-          { offset: Math.PI / 2,   amplitude: 90, frequency: 0.0026, color: resolveColor(["--accent", "--primary"], 0.7),    opacity: 0.35 },
-          { offset: Math.PI,       amplitude: 60, frequency: 0.0034, color: resolveColor(["--secondary","--foreground"], 0.65), opacity: 0.3 },
-          { offset: Math.PI * 1.5, amplitude: 80, frequency: 0.0022, color: resolveColor(["--primary-foreground","--foreground"], 0.25), opacity: 0.25 },
-          { offset: Math.PI * 2,   amplitude: 55, frequency: 0.004,  color: resolveColor(["--foreground"], 0.2),             opacity: 0.2 },
-        ] satisfies WaveConfig[],
-      };
-    };
-
-    let themeColors = computeThemeColors();
-    const observer = new MutationObserver(() => { themeColors = computeThemeColors(); });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "data-theme"] });
-
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const mouseInfluence = reduced ? 10 : 70;
-    const influenceRadius = reduced ? 160 : 320;
-    const smoothing = reduced ? 0.04 : 0.1;
-
-    const resizeCanvas = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
-    const recenterMouse = () => {
-      const c = { x: canvas.width / 2, y: canvas.height / 2 };
-      mouseRef.current = c;
-      targetMouseRef.current = c;
-    };
-
-    resizeCanvas();
-    recenterMouse();
-    window.addEventListener("resize", () => { resizeCanvas(); recenterMouse(); });
-    window.addEventListener("mousemove", (e) => { targetMouseRef.current = { x: e.clientX, y: e.clientY }; });
-    window.addEventListener("mouseleave", recenterMouse);
-
-    const drawWave = (wave: WaveConfig) => {
-      ctx.save();
-      ctx.beginPath();
-      for (let x = 0; x <= canvas.width; x += 4) {
-        const dx = x - mouseRef.current.x;
-        const dy = canvas.height / 2 - mouseRef.current.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const influence = Math.max(0, 1 - dist / influenceRadius);
-        const mouseEffect = influence * mouseInfluence * Math.sin(time * 0.001 + x * 0.01 + wave.offset);
-        const y = canvas.height / 2
-          + Math.sin(x * wave.frequency + time * 0.002 + wave.offset) * wave.amplitude
-          + Math.sin(x * wave.frequency * 0.4 + time * 0.003) * (wave.amplitude * 0.45)
-          + mouseEffect;
-        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      }
-      ctx.lineWidth = 2.5;
-      ctx.strokeStyle = wave.color;
-      ctx.globalAlpha = wave.opacity;
-      ctx.shadowBlur = 35;
-      ctx.shadowColor = wave.color;
-      ctx.stroke();
-      ctx.restore();
-    };
-
-    const animate = () => {
-      time++;
-      mouseRef.current.x += (targetMouseRef.current.x - mouseRef.current.x) * smoothing;
-      mouseRef.current.y += (targetMouseRef.current.y - mouseRef.current.y) * smoothing;
-      const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-      grad.addColorStop(0, themeColors.backgroundTop);
-      grad.addColorStop(1, themeColors.backgroundBottom);
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.globalAlpha = 1;
-      ctx.shadowBlur = 0;
-      themeColors.wavePalette.forEach(drawWave);
-      animationId = requestAnimationFrame(animate);
-    };
-
-    animationId = requestAnimationFrame(animate);
-    return () => {
-      cancelAnimationFrame(animationId);
-      observer.disconnect();
-    };
+      window.addEventListener("mousemove", handleMouseMove);
+      return () => window.removeEventListener("mousemove", handleMouseMove);
+    }, containerRef);
+    return () => ctx.revert();
   }, []);
 
   return (
-    <section
-      id="home"
-      className="relative isolate flex min-h-screen w-full items-center justify-center overflow-hidden"
-      aria-label="Hero section"
-    >
-      {/* Reactive canvas background */}
-      <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-hidden="true" />
-
-      {/* Ambient glow orbs */}
-      <div className="absolute inset-0 -z-10 pointer-events-none" aria-hidden="true">
-        <div className="absolute left-1/2 top-0 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-violet-500/10 blur-[160px]" />
-        <div className="absolute bottom-0 right-1/4 h-[400px] w-[400px] rounded-full bg-indigo-500/8 blur-[130px]" />
-        <div className="absolute top-1/2 left-1/4 h-[350px] w-[350px] -translate-y-1/2 rounded-full bg-purple-500/6 blur-[120px]" />
+    <section ref={containerRef} id="home" className="relative min-h-screen w-full bg-white dark:bg-[#020202] flex flex-col selection:bg-black selection:text-white dark:selection:bg-white dark:selection:text-black overflow-hidden transition-colors duration-500">
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-20 dark:opacity-100 transition-opacity duration-500">
+        <Canvas camera={{ position: [0, 0, 60], fov: 35 }}>
+          <ambientLight intensity={theme === 'light' ? 0.8 : 0.4} />
+          <spotLight position={[50, 50, 50]} intensity={theme === 'light' ? 2 : 3} />
+          <LiquidBackground />
+          <Monolith theme={theme} />
+        </Canvas>
       </div>
 
-      {/* Main content */}
-      <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center px-4 py-20 md:py-28 text-center sm:px-6 md:px-10">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="flex w-full flex-col items-center gap-6 md:gap-8"
-        >
+      <div ref={revealRef} className="relative z-10 w-full flex flex-col md:flex-row p-8 md:p-14 lg:p-20 min-h-screen items-center md:items-stretch gap-10 max-w-7xl mx-auto">
+        <div className="flex-1 min-w-0 flex flex-col justify-between pb-12 md:pb-8 w-full">
+          <div className="flex items-center gap-3">
+             <div className="relative w-2.5 h-2.5 bg-black dark:bg-white rounded-full transition-colors duration-500">
+                <div className="absolute inset-0 bg-black dark:bg-white rounded-full animate-ping opacity-30 transition-colors duration-500" />
+             </div>
+             <span className="font-mono text-[11px] font-bold text-black dark:text-white tracking-[0.2em] uppercase transition-colors duration-500">SRINIVAS.DEV</span>
+          </div>
 
-          {/* Eyebrow badge */}
-          <motion.div variants={fadeUp}>
-            <div className="inline-flex items-center gap-2 rounded-full border border-border/50 bg-background/70 px-4 py-1.5 md:px-5 md:py-2 text-[10px] md:text-[11px] font-semibold uppercase tracking-[0.2em] md:tracking-[0.3em] text-foreground/60 backdrop-blur-md dark:border-border/40 dark:bg-background/50">
-              <Sparkles className="h-3 w-3 md:h-3.5 md:w-3.5 text-violet-500" aria-hidden="true" />
-              Reactive Canvas Developer | Full‑Stack Engineer
-            </div>
-          </motion.div>
-
-          {/* Headline */}
-          <motion.div variants={fadeUp} className="space-y-1 md:space-y-2">
-            <h1 className="text-5xl font-black tracking-tight text-foreground sm:text-6xl md:text-7xl lg:text-8xl leading-[0.9]">
-              Patchipala
-            </h1>
-            <h1 className="text-5xl font-black tracking-tight sm:text-6xl md:text-7xl lg:text-8xl leading-[0.9]">
-              <span className="bg-linear-to-r from-violet-600 via-purple-500 to-indigo-500 bg-clip-text text-transparent">
-                Srinivas
+          <div className="max-w-4xl lg:-translate-y-8 pr-12 my-8 md:my-0">
+            <h1 className="text-[clamp(3.5rem,8.5vw,10.5rem)] font-black leading-[0.87] tracking-tighter text-black dark:text-white uppercase italic-none transition-colors duration-500">
+              PATCHIPALA <br /> 
+              <span 
+                className="text-outline"
+                style={{ WebkitTextFillColor: "transparent", WebkitTextStroke: "2px currentColor" }}
+              >
+                SRINIVAS
               </span>
             </h1>
-          </motion.div>
+            <p className="mt-8 font-mono text-[11px] text-black/50 dark:text-white/40 uppercase tracking-[0.35em] max-w-sm leading-relaxed transition-colors duration-500">
+              We engineer immersive digital experiences through spatial logic and advanced WebGL.
+            </p>
+          </div>
+          
+          <button ref={ctaRef} className="w-fit flex items-center gap-6 group lg:-translate-y-12">
+             <div className="w-14 h-14 rounded-full border border-black/15 dark:border-white/15 flex items-center justify-center group-hover:bg-black dark:group-hover:bg-white transition-all duration-500 overflow-hidden">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="group-hover:stroke-white dark:group-hover:stroke-black stroke-black dark:stroke-white transition-colors duration-500">
+                  <path d="M7 17L17 7M17 7H8M17 7V16" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+             </div>
+             <span className="font-mono text-[11px] font-bold text-black dark:text-white uppercase tracking-[0.2em] transition-colors duration-500">Start a Project</span>
+          </button>
+        </div>
 
-          {/* Description */}
-          <motion.p
-            variants={fadeUp}
-            className="mx-auto max-w-2xl text-base leading-relaxed text-foreground/65 md:text-lg dark:text-foreground/70"
-          >
-            Building modern digital experiences through{" "}
-            <span className="font-semibold text-foreground/90">clean code</span>,{" "}
-            <span className="font-semibold text-foreground/90">intelligent system design</span>, and{" "}
-            <span className="font-semibold text-foreground/90">interactive user interfaces</span>.
-            I focus on creating applications that are fast, scalable, and visually engaging.
-          </motion.p>
-
-          {/* CTA buttons */}
-          <motion.div variants={fadeUp} className="flex flex-col items-center gap-3 sm:flex-row">
-            <Button
-              size="lg"
-              className="group gap-2 rounded-full bg-violet-600 px-8 text-sm font-semibold uppercase tracking-widest text-white shadow-lg shadow-violet-500/30 hover:bg-violet-700 hover:shadow-violet-500/40 transition-all duration-300"
-            >
-              View My Work
-              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true" />
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="rounded-full border-border/40 bg-background/50 px-8 text-sm font-semibold uppercase tracking-widest text-foreground/70 backdrop-blur-md hover:border-violet-500/40 hover:bg-violet-500/5 hover:text-foreground transition-all duration-300"
-            >
-              Download Resume
-            </Button>
-          </motion.div>
-
-          {/* Feature pills */}
-          <motion.ul
-            variants={fadeUp}
-            className="flex flex-wrap items-center justify-center gap-2.5"
-          >
-            {featurePills.map(({ icon: Icon, label }) => (
-              <motion.li
-                key={label}
-                whileHover={{ scale: 1.05, y: -2 }}
-                transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                className="flex items-center gap-2 rounded-full border border-border/40 bg-background/60 px-4 py-2 text-[11px] font-medium uppercase tracking-widest text-foreground/65 backdrop-blur-md dark:border-border/30 dark:bg-background/40 whitespace-nowrap hover:border-violet-500/30 hover:text-foreground transition-colors duration-200 cursor-default"
-              >
-                <Icon className="h-3 w-3 text-violet-500/80 shrink-0" aria-hidden="true" />
-                {label}
-              </motion.li>
-            ))}
-          </motion.ul>
-
-          {/* Tech stack marquee */}
-          <motion.div
-            variants={fadeIn}
-            className="w-full pt-8 opacity-70 hover:opacity-100 transition-opacity duration-500"
-          >
-            <Logos3 heading="Tech Stack & Tools" />
-          </motion.div>
-
-        </motion.div>
+        {/* Right Side Deck */}
+        <div className="w-full md:w-80 lg:w-96 flex-shrink-0 flex flex-col gap-4 justify-center z-20">
+          {[
+            { id: "001", title: "AVAILABILITY", val: "Open", type: "progress" },
+            { id: "002", title: "STUDIO STATS", val: "20+ Wins", type: "data" },
+            { id: "003", title: "EXPERTISE", val: "Creative Dev", type: "text" }
+          ].map((item) => (
+            <div key={item.id} className="command-cell p-6 sm:p-7 block opacity-1 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl backdrop-blur-md transition-colors duration-500">
+              <span className="font-mono text-[9px] text-black/30 dark:text-white/25 uppercase tracking-widest block mb-3 transition-colors duration-500">{item.id} // {item.title}</span>
+              {item.type === "progress" ? (
+                <div className="flex justify-between items-end mt-2">
+                  <h4 className="text-2xl sm:text-3xl font-bold text-black dark:text-white tracking-tighter transition-colors duration-500">{item.val}</h4>
+                  <div className="h-[2px] w-20 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden mb-1 transition-colors duration-500">
+                     <div className="h-full bg-black dark:bg-white w-[60%] animate-pulse transition-colors duration-500" />
+                  </div>
+                </div>
+              ) : item.type === "data" ? (
+                <div className="mt-4 flex flex-col gap-3">
+                  <div className="flex justify-between text-[10px] font-mono text-black/60 dark:text-white/50 transition-colors duration-500">
+                    <span>Awwwards Tier</span>
+                    <span>2024-25</span>
+                  </div>
+                  <div className="h-[1px] w-full bg-black/10 dark:bg-white/10 transition-colors duration-500" />
+                  <div className="flex justify-between text-[10px] font-mono text-black/60 dark:text-white/50 transition-colors duration-500">
+                    <span>Retention Rate</span>
+                    <span>98.2%</span>
+                  </div>
+                </div>
+              ) : (
+                <h3 className="text-sm font-medium text-black/70 dark:text-white/70 mt-3 leading-snug transition-colors duration-500">
+                  Transforming static interfaces into <span className="italic text-black dark:text-white transition-colors duration-500">narrative apertures</span>.
+                </h3>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
-
-      {/* Bottom fade */}
-      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 z-11 bg-linear-to-t from-background to-transparent" aria-hidden="true" />
     </section>
   );
 }

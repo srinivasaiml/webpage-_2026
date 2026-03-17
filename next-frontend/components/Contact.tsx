@@ -75,6 +75,8 @@ const Contact = () => {
                 <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-violet-200/40 rounded-full blur-[100px] dark:hidden" />
             </div>
             <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 relative z-10">
+
+
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
 
                     {/* Left Column: Content + World Map */}
@@ -85,13 +87,19 @@ const Contact = () => {
                         viewport={{ once: true }}
                     >
                         <div className="mb-12">
-                            <div className="w-12 h-12 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 flex items-center justify-center mb-6">
-                                <Mail className="text-indigo-600 dark:text-indigo-400" size={24} />
+                            {/* Section Header - Left Aligned */}
+                            <div className="relative flex items-center py-10 md:py-16 mb-4 overflow-hidden pointer-events-none -ml-2 md:-ml-4">
+                                <span 
+                                    className="absolute left-0 text-[5rem] md:text-[7rem] lg:text-[9rem] font-bold text-slate-200/80 dark:text-slate-800/80 select-none z-0 tracking-tighter whitespace-nowrap"
+                                    style={{ fontFamily: "'Brush Script MT', 'Caveat', 'Dancing Script', var(--font-playfair), cursive" }}
+                                >
+                                    Contact
+                                </span>
+                                <h2 className="relative text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-widest uppercase z-10 pl-2 md:pl-4">
+                                    CONTACT ME.
+                                </h2>
                             </div>
-                            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6 tracking-tight">
-                                Let's Connect
-                            </h2>
-                            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-md leading-relaxed">
+                            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-md leading-relaxed relative z-10">
                                 I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision. Whether you have a question or just want to say hi, I'll try my best to get back to you!
                             </p>
                         </div>
