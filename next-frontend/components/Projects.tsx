@@ -118,8 +118,12 @@ const ProjectTiltBox = ({ project, index }: { project: Project; index: number })
   const mouseXSpring = useSpring(x, { stiffness: 400, damping: 40 });
   const mouseYSpring = useSpring(y, { stiffness: 400, damping: 40 });
 
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["18deg", "-18deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-18deg", "18deg"]);
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["12deg", "-12deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-12deg", "12deg"]);
+  
+  // Spotlight effect
+  const spotlightX = useTransform(mouseXSpring, [-0.5, 0.5], ["0%", "100%"]);
+  const spotlightY = useTransform(mouseYSpring, [-0.5, 0.5], ["0%", "100%"]);
 
   const handleMouseMove = useCallback(
     (e: MouseEvent<HTMLDivElement>) => {
@@ -145,12 +149,17 @@ const ProjectTiltBox = ({ project, index }: { project: Project; index: number })
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 30, scale: 0.95 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: "-50px" }}
       exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ duration: 0.5, delay: index * 0.05 }}
-      style={{ perspective: "1500px" }}
-      className="relative w-full h-[400px] sm:h-[480px] z-1"
+      transition={{ 
+        duration: 0.6, 
+        delay: index * 0.1,
+        ease: [0.22, 1, 0.36, 1] 
+      }}
+      style={{ perspective: "2000px" }}
+      className="relative w-full h-[420px] sm:h-[500px] z-1"
     >
       <motion.div
         ref={ref}
@@ -161,56 +170,70 @@ const ProjectTiltBox = ({ project, index }: { project: Project; index: number })
           rotateY,
           transformStyle: "preserve-3d",
         }}
-        className="w-full h-full relative rounded-[32px] cursor-pointer group"
+        whileHover={{ scale: 1.02 }}
+        className="w-full h-full relative rounded-[40px] cursor-pointer group"
         onClick={() => {
           if (project.demo) window.open(project.demo, "_blank");
           else if (project.github && project.github !== "#") window.open(project.github, "_blank");
         }}
       >
+        {/* Shadow Glow */}
+        <div className="absolute -inset-1 bg-linear-to-r from-indigo-500 to-purple-600 rounded-[42px] blur-xl opacity-0 group-hover:opacity-25 transition-opacity duration-700" />
+
         {/* Main Background Image + Container */}
         <div 
-          className="absolute inset-0 rounded-[32px] overflow-hidden bg-slate-900 border border-slate-200 dark:border-white/10 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.2)] dark:shadow-2xl transition-all duration-500 ease-out group-hover:border-indigo-500/50 group-hover:shadow-[0_20px_40px_-15px_rgba(79,70,229,0.3)]"
+          className="absolute inset-0 rounded-[40px] overflow-hidden bg-slate-900 border border-slate-200 dark:border-white/10 shadow-2xl transition-all duration-700 ease-out group-hover:border-indigo-500/50"
           style={{ transform: "translateZ(0px)" }}
         >
           {/* Base image */}
-          <div className="absolute inset-0 w-full h-full scale-105 group-hover:scale-115 transition-transform duration-[1.5s] ease-out">
+          <div className="absolute inset-0 w-full h-full scale-105 group-hover:scale-110 transition-transform duration-[2s] ease-out">
             <img
               src={project.image}
               alt={project.title}
-              className="w-full h-full object-cover opacity-80 dark:opacity-70 group-hover:opacity-100 transition-opacity"
+              className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-700"
               loading="lazy"
             />
           </div>
           
           {/* Overlays */}
-          <div className="absolute inset-0 bg-linear-to-b from-transparent via-slate-950/40 to-slate-950/95" />
-          <div className="absolute inset-0 bg-indigo-900/10 mix-blend-overlay group-hover:bg-indigo-600/20 transition-colors duration-500" />
+          <div className="absolute inset-0 bg-linear-to-b from-transparent via-slate-950/20 to-slate-950/95" />
+          
+          {/* Pro Max Spotlight Gradient */}
+          <motion.div 
+            className="absolute inset-0 pointer-events-none transition-opacity duration-500 opacity-0 group-hover:opacity-100"
+            style={{
+              background: useTransform(
+                [spotlightX, spotlightY],
+                ([sx, sy]) => `radial-gradient(circle at ${sx} ${sy}, rgba(99, 102, 241, 0.15) 0%, transparent 60%)`
+              )
+            }}
+          />
         </div>
 
-        {/* 3D Content (Glassmorphism layer popping out) */}
+        {/* 3D Content popping out */}
         <div
-          style={{ transform: "translateZ(60px)", transformStyle: "preserve-3d" }}
-          className="absolute inset-0 p-7 flex flex-col justify-between pointer-events-none"
+          style={{ transform: "translateZ(80px)", transformStyle: "preserve-3d" }}
+          className="absolute inset-0 p-8 flex flex-col justify-between pointer-events-none"
         >
           {/* Top section */}
           <div className="flex justify-between items-start" style={{ transformStyle: "preserve-3d" }}>
-            <div
-              style={{ transform: "translateZ(35px)" }}
-              className="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-xl"
+            <motion.div
+              style={{ transform: "translateZ(40px)" }}
+              className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl group-hover:border-white/40 transition-colors"
             >
-              <Folder className="w-6 h-6 text-white drop-shadow-md" />
-            </div>
+              <Folder className="w-6 h-6 text-white drop-shadow-lg" />
+            </motion.div>
 
             <div
-              style={{ transform: "translateZ(25px)" }}
+              style={{ transform: "translateZ(30px)" }}
               className="flex gap-2"
             >
-              <div className="px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center">
-                <span className="text-[10px] font-black text-white tracking-widest leading-none">{project.category}</span>
+              <div className="px-4 py-1.5 rounded-full bg-black/50 backdrop-blur-xl border border-white/10 flex items-center shadow-lg">
+                <span className="text-[11px] font-black text-white tracking-[0.2em] leading-none">{project.category}</span>
               </div>
               {project.featured && (
-                <div className="px-3 py-1 rounded-full bg-yellow-400 text-black border border-yellow-500/20 flex items-center">
-                  <span className="text-[10px] font-black uppercase tracking-tight leading-none">Featured</span>
+                <div className="px-4 py-1.5 rounded-full bg-linear-to-r from-yellow-400 to-orange-500 text-black border border-white/20 flex items-center shadow-[0_0_20px_rgba(234,179,8,0.3)] animate-pulse">
+                  <span className="text-[11px] font-black uppercase tracking-tight leading-none">Featured</span>
                 </div>
               )}
             </div>
@@ -220,44 +243,44 @@ const ProjectTiltBox = ({ project, index }: { project: Project; index: number })
           <div style={{ transformStyle: "preserve-3d" }}>
             {/* Project Box / Glassmorphism Panel */}
             <div
-              style={{ transform: "translateZ(50px)" }}
-              className="w-full rounded-2xl p-5 bg-white/10 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] overflow-hidden relative"
+              style={{ transform: "translateZ(60px)" }}
+              className="w-full rounded-[28px] p-6 bg-slate-950/40 backdrop-blur-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden relative group-hover:bg-slate-950/60 transition-colors duration-500"
             >
-              {/* Internal glow */}
-              <div className="absolute -top-10 -right-10 w-24 h-24 bg-indigo-500/30 rounded-full blur-2xl group-hover:bg-indigo-400/40 transition-colors" />
+              {/* Internal glow line */}
+              <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-indigo-500/50 to-transparent" />
               
               <div className="relative z-10">
-                <div className="flex flex-wrap gap-2 mb-3">
+                <div className="flex flex-wrap gap-2 mb-4">
                   {project.tags.map(tag => (
                     <span 
                       key={tag} 
-                      className="px-2 py-0.5 rounded-md bg-indigo-500/20 border border-white/10 text-[9px] uppercase tracking-wider text-indigo-100 font-bold"
+                      className="px-2.5 py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-[10px] uppercase tracking-wider text-indigo-300 font-bold backdrop-blur-md"
                     >
                       {tag}
                     </span>
                   ))}
                 </div>
-                <h3 className="text-xl md:text-2xl font-black text-white leading-tight mb-2 drop-shadow-lg line-clamp-1">
+                <h3 className="text-2xl md:text-3xl font-black text-white leading-tight mb-3 drop-shadow-2xl">
                   {project.title}
                 </h3>
-                <p className="text-slate-300 text-xs leading-normal mb-5 line-clamp-2">
+                <p className="text-slate-300/90 text-sm leading-relaxed mb-6 font-medium line-clamp-2">
                   {project.description}
                 </p>
               </div>
 
               {/* Action row */}
-              <div className="relative z-10 pt-4 border-t border-white/10 flex items-center justify-between pointer-events-auto">
-                <div className="flex gap-3">
+              <div className="relative z-10 pt-5 border-t border-white/5 flex items-center justify-between pointer-events-auto">
+                <div className="flex gap-5">
                   {project.demo && (
                     <a
                       href={project.demo}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 text-indigo-300 text-[10px] font-black uppercase tracking-[0.15em] hover:text-white transition-colors"
+                      className="flex items-center gap-2 text-indigo-400 text-[11px] font-black uppercase tracking-[0.2em] hover:text-white transition-all transform hover:translate-x-1"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <span>Demo</span>
-                      <ExternalLink className="w-3 h-3" />
+                      <span>Live Demo</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
                     </a>
                   )}
                   {project.github && project.github !== "#" && (
@@ -265,18 +288,21 @@ const ProjectTiltBox = ({ project, index }: { project: Project; index: number })
                       href={project.github}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 text-slate-400 text-[10px] font-black uppercase tracking-[0.15em] hover:text-white transition-colors"
+                      className="flex items-center gap-2 text-slate-400 text-[11px] font-black uppercase tracking-[0.2em] hover:text-white transition-all transform hover:translate-x-1"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <span>Code</span>
-                      <Github className="w-3 h-3" />
+                      <span>Repository</span>
+                      <Github className="w-3.5 h-3.5" />
                     </a>
                   )}
                 </div>
                 
-                <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center group-hover:bg-white/30 transition-colors backdrop-blur-md">
-                  <Plus className="w-4 h-4 text-white" />
-                </div>
+                <motion.div 
+                  whileHover={{ rotate: 90, scale: 1.1 }}
+                  className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-all backdrop-blur-md shadow-inner border border-white/10"
+                >
+                  <Plus className="w-5 h-5 text-white" />
+                </motion.div>
               </div>
             </div>
           </div>

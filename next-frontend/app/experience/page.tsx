@@ -1,15 +1,19 @@
 import SectionPage from '@/components/SectionPage';
 import Experience from '@/components/Experience';
+import Education from '@/components/Education';
 
 export const metadata = {
     title: 'Experience | Srinivas Portfolio',
-    description: 'Professional experience and internships of Srinivas.',
+    description: 'Professional experience and education of Srinivas.',
 };
 
 export default function ExperiencePage() {
     return (
         <SectionPage>
-            <Experience />
+            <div className="space-y-0">
+                <Experience />
+                <Education />
+            </div>
         </SectionPage>
     );
 }

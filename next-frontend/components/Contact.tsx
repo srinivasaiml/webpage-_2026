@@ -118,12 +118,29 @@ const Contact = () => {
                                 className="w-full opacity-80 dark:opacity-20 grayscale brightness-95 dark:brightness-110"
                             />
                             {/* Locator Marker - India */}
-                            <div className="absolute top-[43%] left-[72.3%] -translate-x-1/2 -translate-y-1/2">
-                                <div className="relative">
-                                    <div className="absolute inset-0 bg-orange-500 rounded-full animate-ping opacity-75" />
-                                    <div className="relative w-4 h-4 bg-orange-600 rounded-full border-2 border-white shadow-lg" />
-                                    <div className="absolute -top-12 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white dark:bg-slate-800 shadow-xl border border-slate-200 dark:border-slate-700 px-3 py-1 rounded-full text-[10px] font-bold text-slate-900 dark:text-white animate-bounce">
-                                        I'm here
+                            <div className="absolute top-[43%] left-[72.3%] -translate-x-1/2 -translate-y-1/2 group">
+                                <div className="relative flex flex-col items-center">
+                                    {/* Indicator Line & Label */}
+                                    <div className="absolute bottom-full mb-0 flex flex-col items-center">
+                                        <motion.div 
+                                            initial={{ opacity: 0, y: 10 }}
+                                            whileInView={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: 0.8, duration: 0.5 }}
+                                            className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-2.5 py-1 rounded-md text-[8px] font-black uppercase tracking-[0.2em] shadow-2xl mb-0 whitespace-nowrap"
+                                        >
+                                            Location
+                                        </motion.div>
+                                        <motion.div 
+                                            initial={{ height: 0 }}
+                                            whileInView={{ height: 20 }}
+                                            transition={{ delay: 0.4, duration: 0.6 }}
+                                            className="w-px bg-linear-to-b from-slate-900 dark:from-white to-transparent" 
+                                        />
+                                    </div>
+                                    {/* Dot on the map */}
+                                    <div className="relative w-2 h-2">
+                                        <div className="absolute inset-0 bg-orange-500 rounded-full animate-ping opacity-60" />
+                                        <div className="relative w-2 h-2 bg-orange-600 rounded-full border border-white shadow-lg" />
                                     </div>
                                 </div>
                             </div>

@@ -28,7 +28,7 @@ const Navbar = () => {
   const navItems = [
     { name: 'Home', path: '/' },
     { name: 'Skills', path: '/technical' },
-    { name: 'Education', path: '/journey' },
+    { name: 'Experience', path: '/experience' },
     { name: 'Certification', path: '/verification' },
     { name: 'Contact', path: '/contact' },
   ];
@@ -73,14 +73,14 @@ const Navbar = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => router.push('/')}
-            className="cursor-pointer group z-50 flex-shrink-0"
+            className="cursor-pointer group z-50 shrink-0"
           >
             <div className="relative">
-              <span className={`text-3xl sm:text-4xl md:text-5xl ${dancingScript.className} font-bold tracking-tight bg-gradient-to-r from-orange-400 via-pink-500 to-violet-500 bg-clip-text text-transparent drop-shadow-sm dark:drop-shadow-[0_2px_10px_rgba(236,72,153,0.3)]`}>
+              <span className={`text-3xl sm:text-4xl md:text-5xl ${dancingScript.className} font-bold tracking-tight bg-linear-to-r from-orange-400 via-pink-500 to-violet-500 bg-clip-text text-transparent drop-shadow-sm dark:drop-shadow-[0_2px_10px_rgba(236,72,153,0.3)]`}>
                 P. Srinivas
               </span>
               <motion.div
-                className="h-0.5 bg-gradient-to-r from-orange-500 via-pink-500 to-violet-500 origin-left mt-1"
+                className="h-0.5 bg-linear-to-r from-orange-500 via-pink-500 to-violet-500 origin-left mt-1"
                 initial={{ scaleX: 0 }}
                 whileHover={{ scaleX: 1 }}
                 transition={{ duration: 0.3 }}
