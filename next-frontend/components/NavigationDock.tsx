@@ -53,7 +53,7 @@ export default function NavigationDock() {
             icon: (
                 <IconCertificate className="h-full w-full text-slate-500 dark:text-slate-300" />
             ),
-            href: "#certification",
+            href: "#certificates",
         },
         {
             title: "Contact",
