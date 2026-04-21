@@ -7,6 +7,8 @@ import {
     IconTimeline,
     IconCertificate,
     IconMail,
+    IconSchool,
+    IconFolder,
 } from "@tabler/icons-react";
 
 export default function NavigationDock() {
@@ -16,35 +18,49 @@ export default function NavigationDock() {
             icon: (
                 <IconHome className="h-full w-full text-slate-500 dark:text-slate-300" />
             ),
-            href: "/",
+            href: "#home",
         },
         {
-            title: "Technical",
+            title: "Education",
+            icon: (
+                <IconSchool className="h-full w-full text-slate-500 dark:text-slate-300" />
+            ),
+            href: "#education",
+        },
+        {
+            title: "Skills",
             icon: (
                 <IconTerminal2 className="h-full w-full text-slate-500 dark:text-slate-300" />
             ),
-            href: "/technical",
+            href: "#skills",
         },
         {
-            title: "Journey",
+            title: "Experience",
             icon: (
                 <IconTimeline className="h-full w-full text-slate-500 dark:text-slate-300" />
             ),
-            href: "/journey",
+            href: "#experience",
         },
         {
-            title: "Verification",
+            title: "Projects",
+            icon: (
+                <IconFolder className="h-full w-full text-slate-500 dark:text-slate-300" />
+            ),
+            href: "#projects",
+        },
+        {
+            title: "Certification",
             icon: (
                 <IconCertificate className="h-full w-full text-slate-500 dark:text-slate-300" />
             ),
-            href: "/verification",
+            href: "#certification",
         },
         {
             title: "Contact",
             icon: (
                 <IconMail className="h-full w-full text-slate-500 dark:text-slate-300" />
             ),
-            href: "/contact",
+            href: "#contact",
         },
     ];
 

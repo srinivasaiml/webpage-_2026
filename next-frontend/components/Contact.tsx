@@ -4,7 +4,11 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Send, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 
+import { CursorDrivenParticleTypography } from "@/components/ParticleTypography";
+import { useTheme } from './ThemeProvider';
+
 const Contact = () => {
+    const { theme } = useTheme();
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -67,6 +71,7 @@ const Contact = () => {
         }
     };
 
+    // Calculate dynamic color for the particles based on a dark or light detection, but using CSS classes is easier for the wrapper
     return (
         <section id="contact" className="relative py-24 bg-violet-500/5 dark:bg-slate-950 transition-colors duration-500 overflow-hidden">
             {/* Ambient decorative blurs for Contact section */}
@@ -88,18 +93,27 @@ const Contact = () => {
                     >
                         <div className="mb-12">
                             {/* Section Header - Left Aligned */}
-                            <div className="relative flex items-center py-10 md:py-16 mb-4 overflow-hidden pointer-events-none -ml-2 md:-ml-4">
+                            <div className="relative flex items-center py-6 md:py-10 mb-4 overflow-hidden -ml-2 md:-ml-4">
                                 <span 
-                                    className="absolute left-0 text-[5rem] md:text-[7rem] lg:text-[9rem] font-bold text-slate-200/80 dark:text-slate-800/80 select-none z-0 tracking-tighter whitespace-nowrap"
+                                    className="absolute left-0 text-[5rem] md:text-[7rem] lg:text-[9rem] font-bold text-slate-200/80 dark:text-slate-800/80 select-none z-0 tracking-tighter whitespace-nowrap pointer-events-none"
                                     style={{ fontFamily: "'Brush Script MT', 'Caveat', 'Dancing Script', var(--font-playfair), cursive" }}
                                 >
                                     Contact
                                 </span>
-                                <h2 className="relative text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-widest uppercase z-10 pl-2 md:pl-4">
-                                    CONTACT ME.
-                                </h2>
+                                
+                                {/* Interactive Particles Header */}
+                                <div className="relative z-10 w-full sm:w-[400px] md:w-[450px] -ml-2">
+                                    <CursorDrivenParticleTypography
+                                        className="h-[120px] md:h-[150px] min-h-[100px]! justify-start text-slate-900 dark:text-white"
+                                        text="CONTACT ME."
+                                        fontSize={65}
+                                        particleDensity={3}
+                                        dispersionStrength={20}
+                                        color={theme === 'dark' ? '#ffffff' : '#0f172a'}
+                                    />
+                                </div>
                             </div>
-                            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-md leading-relaxed relative z-10">
+                            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-md leading-relaxed relative z-10 mt-[-20px] md:mt-[-30px]">
                                 I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision. Whether you have a question or just want to say hi, I'll try my best to get back to you!
                             </p>
                         </div>

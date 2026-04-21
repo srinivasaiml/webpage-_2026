@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { 
-  Shield, Eye, Mail, BarChart2, Loader, LogIn, 
+import {
+  Shield, Eye, Mail, BarChart2, Loader, LogIn,
   AlertTriangle, Inbox, Trash2, TrendingUp, Users, Clock,
   CheckCircle, Filter, Search, RefreshCw,
   MessageSquare, Calendar, ArrowUpRight, ChevronDown, ChevronUp,
@@ -140,21 +140,21 @@ const LogoutButton = ({ onClick }: { onClick: () => void }) => {
 
       btn.classList.add("clicked");
       setAnimationState('walking1');
-      
+
       setTimeout(() => {
         btn.classList.add("door-slammed");
         setAnimationState('walking2');
-        
+
         setTimeout(() => {
           btn.classList.add("falling");
           setAnimationState('falling1');
-          
+
           setTimeout(() => {
             setAnimationState('falling2');
-            
+
             setTimeout(() => {
               setAnimationState('falling3');
-              
+
               setTimeout(() => {
                 btn.classList.remove("clicked", "door-slammed", "falling");
                 setAnimationState('default');
@@ -245,7 +245,7 @@ const AdminPage = () => {
   const fetchDashboardData = useCallback(async () => {
     setLoading(true);
     setError('');
-    
+
     const storedKey = sessionStorage.getItem('admin-secret-key');
     const headers = getHeaders(storedKey || '');
     try {
@@ -253,19 +253,19 @@ const AdminPage = () => {
         fetch(`${API_BASE_URL}/api/admin/stats`, { headers }),
         fetch(`${API_BASE_URL}/api/contact`, { headers }),
       ]);
-      
+
       if (!statsRes.ok) throw new Error(`Failed to fetch stats: ${statsRes.status}`);
       if (!messagesRes.ok) throw new Error(`Failed to fetch messages: ${messagesRes.status}`);
-      
+
       const statsJson = await statsRes.json();
       const messagesJson = await messagesRes.json();
 
       setStats(statsJson.data || statsJson);
 
-      const msgs = Array.isArray(messagesJson.data) 
-        ? messagesJson.data 
-        : Array.isArray(messagesJson) 
-          ? messagesJson 
+      const msgs = Array.isArray(messagesJson.data)
+        ? messagesJson.data
+        : Array.isArray(messagesJson)
+          ? messagesJson
           : [];
 
       const enrichedMessages = msgs.map((msg: any) => ({
@@ -279,7 +279,7 @@ const AdminPage = () => {
       setError("Failed to load dashboard data. Access denied or server error.");
       // If error is unauthorized, maybe clearing the key is good
       if (err.message.includes('401') || err.message.includes('403')) {
-          handleLogout();
+        handleLogout();
       }
     } finally {
       setLoading(false);
@@ -294,7 +294,7 @@ const AdminPage = () => {
 
   useEffect(() => {
     const filtered = messages.filter(msg => {
-      const matchesSearch = 
+      const matchesSearch =
         msg.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         msg.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         msg.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -310,15 +310,15 @@ const AdminPage = () => {
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!secretKey) return;
-    
+
     setLoading(true);
     setError('');
-    
+
     try {
       const res = await fetch(`${API_BASE_URL}/api/admin/stats`, {
         headers: getHeaders(secretKey),
       });
-      
+
       if (res.ok) {
         sessionStorage.setItem('admin-secret-key', secretKey);
         setIsAuthenticated(true);
@@ -327,8 +327,8 @@ const AdminPage = () => {
         setError(data.message || 'Invalid secret key. Access denied.');
       }
     } catch (err) {
-        console.error("Auth verification error:", err);
-        setError('Connection failed. Please check if backend is running.');
+      console.error("Auth verification error:", err);
+      setError('Connection failed. Please check if backend is running.');
     } finally {
       setLoading(false);
     }
@@ -353,11 +353,11 @@ const AdminPage = () => {
     const headers = getHeaders(storedKey || '');
     try {
       const res = await fetch(`${API_BASE_URL}/api/contact/${id}`, {
-          method: 'DELETE',
-          headers
+        method: 'DELETE',
+        headers
       });
       if (!res.ok) throw new Error("Delete failed");
-      
+
       setMessages(prev => prev.filter(msg => msg._id !== id));
       setSelectedMessage(null);
       fetchDashboardData();
@@ -402,8 +402,8 @@ const AdminPage = () => {
 
   const cardHoverVariants: Variants = {
     rest: { scale: 1, boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" },
-    hover: { 
-      scale: 1.03, 
+    hover: {
+      scale: 1.03,
       boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
       transition: { duration: 0.3, ease: "easeOut" }
     }
@@ -434,7 +434,7 @@ const AdminPage = () => {
             className="relative z-10 w-full max-w-md px-4"
           >
             <div className="p-8 bg-slate-900/50 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10">
-              <motion.div 
+              <motion.div
                 className="flex flex-col items-center mb-8"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -483,7 +483,7 @@ const AdminPage = () => {
                 </motion.button>
               </form>
               {error && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="mt-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-400 text-sm"
@@ -621,7 +621,7 @@ const AdminPage = () => {
 
         {/* Stats Cards */}
         {stats && (
-          <motion.div 
+          <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -632,7 +632,7 @@ const AdminPage = () => {
               { label: 'Total Messages', value: stats.totalMessages || 0, icon: Mail, color: 'indigo' },
               { label: 'Total Visits', value: stats.totalVisits || 0, icon: Users, color: 'purple' },
             ].map((stat, i) => (
-              <motion.div 
+              <motion.div
                 key={i}
                 variants={itemVariants}
                 className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 relative overflow-hidden group"
@@ -670,8 +670,8 @@ const AdminPage = () => {
             </div>
             {showFilters && (
               <div className="flex items-center gap-4">
-                <select 
-                  value={filterStatus} 
+                <select
+                  value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
                   className="bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-6 py-3 text-sm focus:ring-2 focus:ring-indigo-500"
                 >
@@ -679,8 +679,8 @@ const AdminPage = () => {
                   <option value="new">New</option>
                   <option value="read">Read</option>
                 </select>
-                <select 
-                  value={filterPriority} 
+                <select
+                  value={filterPriority}
                   onChange={(e) => setFilterPriority(e.target.value)}
                   className="bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-6 py-3 text-sm focus:ring-2 focus:ring-indigo-500"
                 >
@@ -705,8 +705,8 @@ const AdminPage = () => {
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {filteredMessages.map((msg) => (
-                  <tr 
-                    key={msg._id} 
+                  <tr
+                    key={msg._id}
                     className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer group"
                     onClick={() => setSelectedMessage(msg)}
                   >
@@ -790,11 +790,11 @@ const AdminPage = () => {
                     <p className="text-slate-500">{selectedMessage.email}</p>
                   </div>
                 </div>
-                <button 
-                    onClick={() => setSelectedMessage(null)}
-                    className="p-2 text-slate-400 hover:text-slate-600 transition-colors"
+                <button
+                  onClick={() => setSelectedMessage(null)}
+                  className="p-2 text-slate-400 hover:text-slate-600 transition-colors"
                 >
-                    <XCircle className="w-8 h-8" />
+                  <XCircle className="w-8 h-8" />
                 </button>
               </div>
               <div className="p-8">
@@ -814,10 +814,10 @@ const AdminPage = () => {
                   </p>
                   <div className="flex gap-4">
                     <button
-                        onClick={() => handleDeleteMessage(selectedMessage._id)}
-                        className="px-6 py-3 text-red-600 font-bold hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all"
+                      onClick={() => handleDeleteMessage(selectedMessage._id)}
+                      className="px-6 py-3 text-red-600 font-bold hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all"
                     >
-                        Delete
+                      Delete
                     </button>
                     <a
                       href={`mailto:${selectedMessage.email}?subject=Re: ${selectedMessage.subject}`}

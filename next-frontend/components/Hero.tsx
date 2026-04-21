@@ -5,6 +5,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Float, MeshDistortMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 import gsap from 'gsap';
+import { motion } from 'framer-motion';
 import { useTheme } from './ThemeProvider';
 import Image from 'next/image';
 
@@ -111,8 +112,72 @@ export default function Hero() {
         </Canvas>
       </div>
 
+      {/* Dark-mode only lamp / glow animation */}
+      {theme === 'dark' && (
+        <div className="absolute top-0 isolate z-0 flex w-screen flex-1 items-start justify-center pointer-events-none">
+          <div className="absolute top-0 z-50 h-48 w-screen bg-transparent opacity-10 backdrop-blur-md" />
+
+          {/* Main glow */}
+          <div className="absolute inset-auto z-50 h-36 w-[28rem] -translate-y-[-30%] rounded-full bg-white/60 opacity-80 blur-3xl" />
+
+          {/* Lamp effect */}
+          <motion.div
+            initial={{ width: "8rem" }}
+            viewport={{ once: true }}
+            transition={{ ease: "easeInOut", delay: 0.3, duration: 0.8 }}
+            whileInView={{ width: "16rem" }}
+            className="absolute top-0 z-30 h-36 -translate-y-[20%] rounded-full bg-white/60 blur-2xl"
+          />
+
+          {/* Top line */}
+          <motion.div
+            initial={{ width: "15rem" }}
+            viewport={{ once: true }}
+            transition={{ ease: "easeInOut", delay: 0.3, duration: 0.8 }}
+            whileInView={{ width: "30rem" }}
+            className="absolute inset-auto z-50 h-0.5 -translate-y-[-10%] bg-white/60"
+          />
+
+          {/* Left gradient cone */}
+          <motion.div
+            initial={{ opacity: 0.5, width: "15rem" }}
+            whileInView={{ opacity: 1, width: "30rem" }}
+            transition={{
+              delay: 0.3,
+              duration: 0.8,
+              ease: "easeInOut",
+            }}
+            style={{
+              backgroundImage: `conic-gradient(var(--conic-position), var(--tw-gradient-stops))`,
+            }}
+            className="absolute inset-auto right-1/2 h-56 overflow-visible w-[30rem] bg-gradient-conic from-white/60 via-transparent to-transparent [--conic-position:from_70deg_at_center_top]"
+          >
+            <div className="absolute w-[100%] left-0 bg-[#020202] h-40 bottom-0 z-20 [mask-image:linear-gradient(to_top,white,transparent)]" />
+            <div className="absolute w-40 h-[100%] left-0 bg-[#020202] bottom-0 z-20 [mask-image:linear-gradient(to_right,white,transparent)]" />
+          </motion.div>
+
+          {/* Right gradient cone */}
+          <motion.div
+            initial={{ opacity: 0.5, width: "15rem" }}
+            whileInView={{ opacity: 1, width: "30rem" }}
+            transition={{
+              delay: 0.3,
+              duration: 0.8,
+              ease: "easeInOut",
+            }}
+            style={{
+              backgroundImage: `conic-gradient(var(--conic-position), var(--tw-gradient-stops))`,
+            }}
+            className="absolute inset-auto left-1/2 h-56 w-[30rem] bg-gradient-conic from-transparent via-transparent to-white/60 [--conic-position:from_290deg_at_center_top]"
+          >
+            <div className="absolute w-40 h-[100%] right-0 bg-[#020202] bottom-0 z-20 [mask-image:linear-gradient(to_left,white,transparent)]" />
+            <div className="absolute w-[100%] right-0 bg-[#020202] h-40 bottom-0 z-20 [mask-image:linear-gradient(to_top,white,transparent)]" />
+          </motion.div>
+        </div>
+      )}
+
       <div ref={revealRef} className="relative z-10 w-full flex flex-col md:flex-row pt-32 pb-12 px-6 md:p-14 lg:p-20 min-h-screen md:items-stretch gap-12 md:gap-10 max-w-7xl mx-auto">
-        <div className="flex-1 min-w-0 flex flex-col justify-center md:justify-between w-full">
+        <div className="flex-1 min-w-0 flex flex-col justify-center md:justify-between w-full md:-translate-x-6 lg:-translate-x-10">
           <div className="flex items-center gap-3">
             <div className="relative w-2.5 h-2.5 bg-black dark:bg-white rounded-full transition-colors duration-500">
               <div className="absolute inset-0 bg-black dark:bg-white rounded-full animate-ping opacity-30 transition-colors duration-500" />
@@ -136,14 +201,6 @@ export default function Hero() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 lg:-translate-y-12 mt-6 md:mt-0">
-            <button ref={ctaRef} className="w-fit flex items-center gap-4 group">
-              <div className="w-12 h-12 md:w-14 md:h-14 rounded-full border border-black/15 dark:border-white/15 flex items-center justify-center group-hover:bg-black dark:group-hover:bg-white transition-all duration-500 overflow-hidden shrink-0">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="group-hover:stroke-white dark:group-hover:stroke-black stroke-black dark:stroke-white transition-colors duration-500">
-                  <path d="M7 17L17 7M17 7H8M17 7V16" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-              <span className="font-mono text-[10px] md:text-[11px] font-bold text-black dark:text-white uppercase tracking-[0.2em] transition-colors duration-500 text-left">Start a Project</span>
-            </button>
             <a href="/Srinivas_P_2026.pdf" download className="w-fit flex items-center gap-4 group">
               <div className="w-12 h-12 md:w-14 md:h-14 rounded-full border border-black/15 dark:border-white/15 flex items-center justify-center group-hover:bg-black dark:group-hover:bg-white transition-all duration-500 overflow-hidden shrink-0">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="group-hover:stroke-white dark:group-hover:stroke-black stroke-black dark:stroke-white transition-colors duration-500">
@@ -163,7 +220,7 @@ export default function Hero() {
             <div
               key={item.id}
               className={`command-cell block transition-colors duration-500 ${item.type === 'image'
-                ? 'flex flex-col items-center justify-center pt-4 md:pt-8'
+                ? 'flex flex-col items-center justify-center pt-4 md:pt-8 translate-y-10'
                 : 'p-6 sm:p-7 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl backdrop-blur-md'
                 }`}
             >
@@ -175,10 +232,10 @@ export default function Hero() {
               {item.type === "image" ? (
                 <div className="flex flex-col items-center justify-center w-full relative z-50">
                   <Image
-                    src="/srin.png"
+                    src="/sssss.png"
                     alt="P. Srinivas"
-                    width={400}
-                    height={500}
+                    width={330}
+                    height={200}
                     className="object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
                     priority
                     unoptimized
@@ -195,3 +252,4 @@ export default function Hero() {
     </section>
   );
 }
+

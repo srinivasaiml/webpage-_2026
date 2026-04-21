@@ -151,12 +151,12 @@
     @apply bg-background text-foreground;
     background-image: linear-gradient(to bottom, transparent, oklch(0.95 0.02 260 / 0.3));
     min-height: 100vh;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   html {
     @apply font-sans;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 }
 

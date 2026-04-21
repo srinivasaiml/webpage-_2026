@@ -26,14 +26,51 @@ const Navbar = () => {
   }, []);
 
   const navItems = [
-    { name: 'Home', path: '/' },
-    { name: 'Skills', path: '/technical' },
-    { name: 'Experience', path: '/experience' },
-    { name: 'Certification', path: '/verification' },
-    { name: 'Contact', path: '/contact' },
+    { name: 'Home', path: '#home' },
+    { name: 'Skills', path: '#skills' },
+    { name: 'Projects', path: '#projects' },
+    { name: 'Certificates', path: '#certificates' },
+    { name: 'Contact', path: '#contact' },
   ];
 
-  const activeIndex = navItems.findIndex(item => item.path === pathname);
+  const handleNavClick = (path: string) => {
+    if (path.startsWith('#')) {
+      const element = document.getElementById(path.substring(1));
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      router.push(path);
+    }
+  };
+
+  const [activePath, setActivePath] = useState('#home');
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+      
+      // Determine active section based on scroll position
+      const sections = navItems.map(item => item.path.substring(1));
+      let currentSection = sections[0];
+      
+      for (const section of sections) {
+        const element = document.getElementById(section);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          if (rect.top <= 100) {
+            currentSection = section;
+          }
+        }
+      }
+      setActivePath(`#${currentSection}`);
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const activeIndex = navItems.findIndex(item => item.path === activePath);
 
   // Measure real label positions for accurate indicator placement
   const pillContainerRef = useRef<HTMLDivElement>(null);
@@ -98,8 +135,8 @@ const Navbar = () => {
                     name="nav"
                     id={`nav-${idx}`}
                     className="hidden"
-                    checked={pathname === item.path}
-                    onChange={() => router.push(item.path)}
+                    checked={activePath === item.path}
+                    onChange={() => handleNavClick(item.path)}
                   />
                   <label
                     htmlFor={`nav-${idx}`}
@@ -208,10 +245,10 @@ const Navbar = () => {
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: idx * 0.1 }}
                     onClick={() => {
-                      router.push(item.path);
+                      handleNavClick(item.path);
                       setIsOpen(false);
                     }}
-                    className={`text-left px-4 py-3 rounded-2xl text-xl font-semibold transition-all ${pathname === item.path
+                    className={`text-left px-4 py-3 rounded-2xl text-xl font-semibold transition-all ${activePath === item.path
                         ? 'bg-linear-to-r from-orange-500/10 to-violet-500/10 dark:from-orange-500/20 dark:to-violet-500/20 text-violet-600 dark:text-violet-400'
                       : 'text-foreground/70 hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground'
                       }`}
