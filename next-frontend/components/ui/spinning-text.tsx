@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import React from "react";
+import React, { useId } from "react";
 
 type SpinningTextProps = {
   text: string;
@@ -21,7 +21,8 @@ const SpinningText: React.FC<SpinningTextProps> = ({
   className,
 }) => {
   // Generate a unique ID for the path to allow multiple instances
-  const pathId = `circlePath-${Math.random().toString(36).substring(2, 9)}`;
+  const id = useId();
+  const pathId = `circlePath-${id.replace(/:/g, "")}`;
 
   return (
     <div className={cn("relative flex items-center justify-center", className)}>

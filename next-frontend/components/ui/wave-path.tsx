@@ -7,31 +7,48 @@ type WWavePathProps = React.ComponentProps<'div'>;
 
 export function WavePath({ className, ...props }: WWavePathProps) {
 	const path = useRef<SVGPathElement>(null);
-	let progress = 0;
-	let x = 0.2;
-	let time = Math.PI / 2;
-	let reqId: number | null = null;
+	const progress = useRef(0);
+	const x = useRef(0.2);
+	const time = useRef(Math.PI / 2);
+	const reqId = useRef<number | null>(null);
 
-	useEffect(() => {
-		setPath(progress);
-	}, []);
-
-	const setPath = (progress: number) => {
+	const setPath = (p: number) => {
 		const width = window.innerWidth * 0.7;
 		if (path.current) {
 			path.current.setAttributeNS(
 				null,
 				'd',
-				`M0 100 Q${width * x} ${100 + progress * 0.6}, ${width} 100`,
+				`M0 100 Q${width * x.current} ${100 + p * 0.6}, ${width} 100`,
 			);
 		}
 	};
 
+	useEffect(() => {
+		setPath(progress.current);
+	}, []);
+
 	const lerp = (x: number, y: number, a: number) => x * (1 - a) + y * a;
 
+	const resetAnimation = () => {
+		time.current = Math.PI / 2;
+		progress.current = 0;
+	};
+
+	const animateOut = () => {
+		const newProgress = progress.current * Math.sin(time.current);
+		progress.current = lerp(progress.current, 0, 0.025);
+		time.current += 0.2;
+		setPath(newProgress);
+		if (Math.abs(progress.current) > 0.75) {
+			reqId.current = requestAnimationFrame(animateOut);
+		} else {
+			resetAnimation();
+		}
+	};
+
 	const manageMouseEnter = () => {
-		if (reqId) {
-			cancelAnimationFrame(reqId);
+		if (reqId.current) {
+			cancelAnimationFrame(reqId.current);
 			resetAnimation();
 		}
 	};
@@ -40,31 +57,14 @@ export function WavePath({ className, ...props }: WWavePathProps) {
 		const { movementY, clientX } = e;
 		if (path.current) {
 			const pathBound = path.current.getBoundingClientRect();
-			x = (clientX - pathBound.left) / pathBound.width;
-			progress += movementY;
-			setPath(progress);
+			x.current = (clientX - pathBound.left) / pathBound.width;
+			progress.current += movementY;
+			setPath(progress.current);
 		}
 	};
 
 	const manageMouseLeave = () => {
 		animateOut();
-	};
-
-	const animateOut = () => {
-		const newProgress = progress * Math.sin(time);
-		progress = lerp(progress, 0, 0.025);
-		time += 0.2;
-		setPath(newProgress);
-		if (Math.abs(progress) > 0.75) {
-			reqId = requestAnimationFrame(animateOut);
-		} else {
-			resetAnimation();
-		}
-	};
-
-	const resetAnimation = () => {
-		time = Math.PI / 2;
-		progress = 0;
 	};
 
 	return (
