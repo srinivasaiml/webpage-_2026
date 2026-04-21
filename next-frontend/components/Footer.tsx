@@ -1,4 +1,4 @@
-import { CinematicFooter } from './CinematicFooter';
+import CinematicFooter from './CinematicFooter';
 
 export default function Footer() {
     return <CinematicFooter />;
